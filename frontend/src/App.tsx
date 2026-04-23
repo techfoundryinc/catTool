@@ -53,8 +53,9 @@ export default function App() {
       setActiveId(segs[0]?.id ?? null);
       setFilter("all");
       setSearchQuery("");
-    } catch (e) {
-      setError("Failed to load file. Make sure it is a valid XLIFF 1.2 file.");
+    } catch (e: unknown) {
+      const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(detail ?? "Failed to load file. Make sure it is a valid XLIFF 1.2 file.");
     }
   }
 
