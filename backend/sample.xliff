@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="sample.txt" datatype="plaintext" source-language="en" target-language="fr">
+    <body>
+      <trans-unit id="1">
+        <source>Welcome to the CAT Tool.</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="2">
+        <source>Please translate the following segments carefully.</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="3">
+        <source>The quick brown fox jumps over the lazy dog.</source>
+        <target state="translated">Le rapide renard brun saute par-dessus le chien paresseux.</target>
+      </trans-unit>
+      <trans-unit id="4">
+        <source>Translation memory helps you reuse previous translations.</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="5">
+        <source>Confirm a segment to save it to the translation memory.</source>
+        <target state="final">Confirmez un segment pour l'enregistrer dans la mémoire de traduction.</target>
+      </trans-unit>
+      <trans-unit id="6">
+        <source>Use keyboard shortcuts to navigate between segments efficiently.</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="7">
+        <source>Press Tab to move to the next segment.</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="8">
+        <source>Press Shift+Tab to move to the previous segment.</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="9">
+        <source>Press Ctrl+Enter to confirm the current segment.</source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="10">
+        <source>Export your work as an XLIFF file when finished.</source>
+        <target></target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
