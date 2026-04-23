@@ -14,7 +14,10 @@ router = APIRouter(prefix="/api/files", tags=["segments"])
 @router.post("/upload", response_model=FileInfo)
 async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
     content = await file.read()
-    parsed = parse_xliff(content)
+    try:
+        parsed = parse_xliff(content)
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=f"XLIFF parse error: {e}")
     file_id = generate_file_id(content)
 
     # Remove existing segments for this file_id to allow re-upload
