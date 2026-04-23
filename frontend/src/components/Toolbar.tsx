@@ -34,7 +34,7 @@ export function Toolbar({
 
   return (
     <header className="bg-white border-b border-gray-200 px-4 py-3 flex flex-wrap items-center gap-3">
-      <h1 className="text-lg font-bold text-blue-700 mr-2">CAT Tool</h1>
+      <img src="/intuit-logo.svg" alt="Intuit" className="h-7 mr-2" />
 
       <button
         onClick={() => inputRef.current?.click()}
