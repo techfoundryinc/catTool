@@ -22,7 +22,7 @@ class SegmentUpdate(BaseModel):
 class TMMatch(BaseModel):
     source_text: str
     target_text: str
-    score: int  # 0-100
+    score: int  # 0-100, or 101 for ICE match
 
 
 class TMEntryOut(BaseModel):
