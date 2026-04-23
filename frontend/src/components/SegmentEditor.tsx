@@ -5,12 +5,14 @@ import { SegmentRow } from "./SegmentRow";
 interface Props {
   segments: Segment[];
   activeId: number | null;
+  sourceLang?: string;
+  targetLang?: string;
   onFocus: (id: number) => void;
   onChange: (segId: string, text: string) => void;
   onConfirm: (segId: string) => void;
 }
 
-export function SegmentEditor({ segments, activeId, onFocus, onChange, onConfirm }: Props) {
+export function SegmentEditor({ segments, activeId, sourceLang, targetLang, onFocus, onChange, onConfirm }: Props) {
   const handleNavigate = useCallback(
     (dir: "next" | "prev") => {
       if (activeId === null) return;
@@ -39,10 +41,14 @@ export function SegmentEditor({ segments, activeId, onFocus, onChange, onConfirm
       <table className="w-full border-collapse table-fixed">
         <thead className="sticky top-0 z-10 bg-gray-100 border-b-2 border-gray-300">
           <tr>
-            <th className="w-10 px-2 py-2 text-xs text-gray-500 font-semibold text-center">#</th>
-            <th className="w-1/2 px-3 py-2 text-xs text-gray-500 font-semibold text-left">Source</th>
-            <th className="w-1/2 px-3 py-2 text-xs text-gray-500 font-semibold text-left">Target</th>
-            <th className="w-28 px-2 py-2 text-xs text-gray-500 font-semibold text-right">Status</th>
+            <th className="w-8 px-2 py-2 text-xs text-gray-500 font-semibold text-center border-r border-gray-200">#</th>
+            <th className="w-[47%] px-3 py-2 text-xs text-gray-600 font-semibold text-left border-r border-gray-200">
+              Source{sourceLang ? `: ${sourceLang}` : ""}
+            </th>
+            <th className="w-[47%] px-3 py-2 text-xs text-gray-600 font-semibold text-left border-r border-gray-200">
+              Target{targetLang ? `: ${targetLang}` : ""}
+            </th>
+            <th className="w-12 px-2 py-2 text-xs text-gray-500 font-semibold text-center"></th>
           </tr>
         </thead>
         <tbody>

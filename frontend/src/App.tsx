@@ -176,6 +176,8 @@ export default function App() {
         <SegmentEditor
           segments={visibleSegments}
           activeId={activeId}
+          sourceLang={fileInfo?.source_lang}
+          targetLang={fileInfo?.target_lang}
           onFocus={handleFocus}
           onChange={handleChange}
           onConfirm={handleConfirm}
@@ -183,6 +185,8 @@ export default function App() {
         <TMPanel
           matches={tmMatches}
           loading={tmLoading}
+          sourceLang={fileInfo?.source_lang}
+          targetLang={fileInfo?.target_lang}
           onApply={handleApplyTM}
         />
       </div>

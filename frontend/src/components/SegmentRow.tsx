@@ -11,31 +11,19 @@ interface Props {
   onNavigate: (dir: "next" | "prev") => void;
 }
 
-const STATUS_STYLES: Record<SegmentStatus, string> = {
-  new: "bg-white",
-  draft: "bg-yellow-50",
-  confirmed: "bg-green-50",
-};
-
-function tmBadge(score: number | null): { label: string; cls: string } | null {
-  if (score === 101) return { label: "101% ICE", cls: "bg-blue-100 text-blue-800 border border-blue-300" };
-  if (score === 100) return { label: "100%", cls: "bg-green-100 text-green-800 border border-green-300" };
-  if (score !== null && score >= 75) return { label: `${score}%`, cls: "bg-yellow-100 text-yellow-800 border border-yellow-300" };
-  return null;
+function rowBg(status: SegmentStatus, isActive: boolean): string {
+  if (isActive) return "bg-orange-50";
+  if (status === "confirmed") return "bg-green-50";
+  return "bg-white";
 }
 
-function tmLeftBorder(score: number | null): string {
-  if (score === 101) return "border-l-4 border-l-blue-400";
-  if (score === 100) return "border-l-4 border-l-green-400";
-  if (score !== null && score >= 75) return "border-l-4 border-l-yellow-400";
-  return "border-l-4 border-l-transparent";
+function StatusIcon({ status }: { status: SegmentStatus }) {
+  if (status === "confirmed")
+    return <span className="text-green-600 text-base leading-none">✓</span>;
+  if (status === "draft")
+    return <span className="text-red-500 text-base leading-none">✗</span>;
+  return <span className="text-gray-300 text-base leading-none">○</span>;
 }
-
-const STATUS_BADGE: Record<SegmentStatus, string> = {
-  new: "bg-gray-200 text-gray-600",
-  draft: "bg-yellow-200 text-yellow-800",
-  confirmed: "bg-green-200 text-green-800",
-};
 
 export function SegmentRow({
   segment,
@@ -49,12 +37,9 @@ export function SegmentRow({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (isActive) {
-      textareaRef.current?.focus();
-    }
+    if (isActive) textareaRef.current?.focus();
   }, [isActive]);
 
-  // Auto-resize textarea height
   useEffect(() => {
     const ta = textareaRef.current;
     if (ta) {
@@ -76,64 +61,53 @@ export function SegmentRow({
     [onNavigate, onConfirm, segment.seg_id]
   );
 
-  const badge = tmBadge(segment.tm_score);
-
   return (
     <tr
-      className={`border-b border-gray-200 transition-colors ${STATUS_STYLES[segment.status]} ${tmLeftBorder(segment.tm_score)} ${
-        isActive ? "ring-2 ring-inset ring-blue-400" : "hover:bg-blue-50/30"
+      className={`border-b border-gray-200 transition-colors cursor-pointer ${rowBg(segment.status, isActive)} ${
+        isActive ? "outline outline-2 outline-orange-400 outline-offset-[-2px]" : "hover:bg-orange-50/40"
       }`}
       onClick={() => onFocus(segment.id)}
     >
       {/* Row number */}
-      <td className="w-10 px-2 py-2 text-center text-xs text-gray-400 select-none align-top pt-3">
+      <td className="w-8 px-2 py-2 text-center text-xs text-gray-500 select-none align-top pt-2.5 border-r border-gray-200 font-medium">
         {index + 1}
       </td>
 
       {/* Source */}
-      <td className="w-1/2 px-3 py-2 text-sm text-gray-700 align-top whitespace-pre-wrap break-words">
+      <td className="w-[47%] px-3 py-2 text-sm text-gray-800 align-top whitespace-pre-wrap break-words border-r border-gray-200">
         {segment.source_text}
       </td>
 
       {/* Target */}
-      <td className="w-1/2 px-2 py-2 align-top">
+      <td className="w-[47%] px-2 py-1.5 align-top border-r border-gray-200">
         <textarea
           ref={textareaRef}
-          className={`seg-target w-full resize-none text-sm bg-transparent border-0 p-1 rounded min-h-[2rem] ${
-            isActive ? "bg-white shadow-inner" : ""
-          }`}
+          className="seg-target w-full resize-none text-sm bg-transparent border-0 p-1 min-h-[1.5rem] focus:outline-none placeholder-gray-300"
           value={segment.target_text}
-          placeholder="Enter translation…"
+          placeholder={isActive ? "Type translation…" : ""}
           onChange={(e) => onChange(segment.seg_id, e.target.value)}
           onFocus={() => onFocus(segment.id)}
           onKeyDown={handleKeyDown}
           rows={1}
         />
-      </td>
-
-      {/* Status badge + TM origin badge + confirm button */}
-      <td className="w-28 px-2 py-2 align-top">
-        <div className="flex flex-col items-end gap-1">
-          <span
-            className={`text-xs px-1.5 py-0.5 rounded capitalize font-medium ${STATUS_BADGE[segment.status]}`}
-          >
-            {segment.status}
-          </span>
-          {badge && (
-            <span className={`text-xs px-1.5 py-0.5 rounded font-semibold ${badge.cls}`}>
-              {badge.label}
-            </span>
-          )}
-          {isActive && segment.status !== "confirmed" && (
+        {isActive && segment.status !== "confirmed" && (
+          <div className="flex justify-end mt-0.5">
             <button
-              onMouseDown={(e) => {
-                e.preventDefault(); // keep textarea focus
-                onConfirm(segment.seg_id);
-              }}
+              onMouseDown={(e) => { e.preventDefault(); onConfirm(segment.seg_id); }}
               className="text-xs px-2 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
             >
               Confirm
             </button>
+          </div>
+        )}
+      </td>
+
+      {/* Status icons */}
+      <td className="w-12 px-2 py-2 align-top">
+        <div className="flex flex-col items-center gap-1 pt-0.5">
+          <StatusIcon status={segment.status} />
+          {segment.tm_score !== null && (
+            <span className="text-xs text-gray-400 font-mono">{segment.tm_score === 101 ? "🔒" : `${segment.tm_score}%`}</span>
           )}
         </div>
       </td>
