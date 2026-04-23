@@ -36,6 +36,34 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
         db.add(record)
     db.commit()
 
+    # Auto-apply 101% ICE matches for untranslated segments
+    all_segs = (
+        db.query(SegmentRecord)
+        .filter(SegmentRecord.file_id == file_id)
+        .order_by(SegmentRecord.id)
+        .all()
+    )
+    for idx, seg in enumerate(all_segs):
+        if seg.status != "new" or seg.target_text.strip():
+            continue
+        prev_source = all_segs[idx - 1].source_text if idx > 0 else None
+        next_source = all_segs[idx + 1].source_text if idx < len(all_segs) - 1 else None
+        ice_match = (
+            db.query(TMEntry)
+            .filter(
+                TMEntry.source_lang == seg.source_lang,
+                TMEntry.target_lang == seg.target_lang,
+                TMEntry.source_text == seg.source_text,
+                TMEntry.prev_source == prev_source,
+                TMEntry.next_source == next_source,
+            )
+            .first()
+        )
+        if ice_match:
+            seg.target_text = ice_match.target_text
+            seg.status = "draft"
+    db.commit()
+
     return _file_info(db, file_id, parsed["source_lang"], parsed["target_lang"])
 
 
