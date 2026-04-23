@@ -63,6 +63,7 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
             seg.target_text = ice_match.target_text
             seg.status = "draft"
             seg.tm_score = 101
+            seg.locked = True
     db.commit()
 
     return _file_info(db, file_id, parsed["source_lang"], parsed["target_lang"])
@@ -92,6 +93,8 @@ def update_segment(
     )
     if not seg:
         raise HTTPException(404, "Segment not found")
+    if seg.locked:
+        raise HTTPException(423, "Segment is locked")
 
     if seg.target_text != body.target_text:
         seg.tm_score = None  # translator modified the TM suggestion

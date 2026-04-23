@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, text
+from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, Boolean, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from datetime import datetime, timezone
 
@@ -35,6 +35,7 @@ class SegmentRecord(Base):
     target_text = Column(Text, nullable=False, default="")
     status = Column(String(20), nullable=False, default="new")
     tm_score = Column(Integer, nullable=True)
+    locked = Column(Boolean, nullable=False, default=False)
     source_lang = Column(String(10), nullable=False)
     target_lang = Column(String(10), nullable=False)
 
@@ -49,11 +50,12 @@ def init_db():
                 conn.commit()
             except Exception:
                 pass
-        try:
-            conn.execute(text("ALTER TABLE segments ADD COLUMN tm_score INTEGER"))
-            conn.commit()
-        except Exception:
-            pass
+        for col in ("tm_score INTEGER", "locked INTEGER DEFAULT 0"):
+            try:
+                conn.execute(text(f"ALTER TABLE segments ADD COLUMN {col}"))
+                conn.commit()
+            except Exception:
+                pass
 
 
 def get_db():

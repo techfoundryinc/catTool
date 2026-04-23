@@ -7,6 +7,7 @@ export interface Segment {
   target_text: string;
   status: SegmentStatus;
   tm_score: number | null;
+  locked: boolean;
   source_lang: string;
   target_lang: string;
 }
