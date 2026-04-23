@@ -35,11 +35,7 @@ export function Toolbar({
 
   return (
     <header className="bg-white border-b border-gray-200 px-4 py-3 flex flex-wrap items-center gap-3">
-<<<<<<< HEAD
-      <img src="/intuit-logo.png" alt="Intuit" className="h-7 mr-2" />
-=======
       <img src="/intuit-logo.png" alt="Intuit" className="h-16 ml-6 mr-2" />
->>>>>>> 6984db5 (fix: styling issues)
 
       <button
         onClick={() => inputRef.current?.click()}
@@ -47,6 +43,13 @@ export function Toolbar({
       >
         Open XLIFF
       </button>
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".xliff,.xlf"
+        className="hidden"
+        onChange={handleFile}
+      />
       <input
         ref={inputRef}
         type="file"
