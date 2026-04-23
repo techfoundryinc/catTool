@@ -31,10 +31,18 @@ export async function updateSegment(
 export async function lookupTM(
   sourceText: string,
   sourceLang: string,
-  targetLang: string
+  targetLang: string,
+  prevSource?: string,
+  nextSource?: string
 ): Promise<TMMatch[]> {
   const { data } = await api.get<TMMatch[]>("/tm/lookup", {
-    params: { source_text: sourceText, source_lang: sourceLang, target_lang: targetLang },
+    params: {
+      source_text: sourceText,
+      source_lang: sourceLang,
+      target_lang: targetLang,
+      prev_source: prevSource ?? null,
+      next_source: nextSource ?? null,
+    },
   });
   return data;
 }

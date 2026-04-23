@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from datetime import datetime, timezone
 
@@ -20,6 +20,8 @@ class TMEntry(Base):
     target_lang = Column(String(10), nullable=False)
     source_text = Column(Text, nullable=False)
     target_text = Column(Text, nullable=False)
+    prev_source = Column(Text, nullable=True)
+    next_source = Column(Text, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
@@ -38,6 +40,14 @@ class SegmentRecord(Base):
 
 def init_db():
     Base.metadata.create_all(bind=engine)
+    # Migrate: add context columns to existing tm_entries tables
+    with engine.connect() as conn:
+        for col in ("prev_source", "next_source"):
+            try:
+                conn.execute(text(f"ALTER TABLE tm_entries ADD COLUMN {col} TEXT"))
+                conn.commit()
+            except Exception:
+                pass
 
 
 def get_db():

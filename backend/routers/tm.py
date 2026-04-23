@@ -16,6 +16,8 @@ def lookup_tm(
     source_text: str = Query(...),
     source_lang: str = Query(...),
     target_lang: str = Query(...),
+    prev_source: str = Query(None),
+    next_source: str = Query(None),
     db: Session = Depends(get_db),
 ):
     candidates = (
@@ -27,7 +29,10 @@ def lookup_tm(
     results = []
     for entry in candidates:
         if source_text == entry.source_text:
-            score = 101  # ICE match: identical source string
+            # ICE (101%): source matches AND stored context matches current context exactly
+            prev_ok = prev_source == entry.prev_source
+            next_ok = next_source == entry.next_source
+            score = 101 if (prev_ok and next_ok) else 100
         else:
             score = fuzz.token_sort_ratio(source_text, entry.source_text)
         if score >= MIN_SCORE:

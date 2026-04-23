@@ -37,7 +37,10 @@ export default function App() {
       return;
     }
     setTmLoading(true);
-    lookupTM(activeSegment.source_text, activeSegment.source_lang, activeSegment.target_lang)
+    const idx = allSegments.findIndex((s) => s.id === activeSegment.id);
+    const prevSource = idx > 0 ? allSegments[idx - 1].source_text : undefined;
+    const nextSource = idx < allSegments.length - 1 ? allSegments[idx + 1].source_text : undefined;
+    lookupTM(activeSegment.source_text, activeSegment.source_lang, activeSegment.target_lang, prevSource, nextSource)
       .then(setTmMatches)
       .catch(() => setTmMatches([]))
       .finally(() => setTmLoading(false));

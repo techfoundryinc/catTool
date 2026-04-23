@@ -69,8 +69,18 @@ def update_segment(
     db.commit()
     db.refresh(seg)
 
-    # Add to TM when confirmed
+    # Add to TM when confirmed, capturing surrounding context for ICE detection
     if body.status == "confirmed" and body.target_text.strip():
+        all_segs = (
+            db.query(SegmentRecord)
+            .filter(SegmentRecord.file_id == file_id)
+            .order_by(SegmentRecord.id)
+            .all()
+        )
+        idx = next((i for i, s in enumerate(all_segs) if s.seg_id == seg_id), None)
+        prev_source = all_segs[idx - 1].source_text if idx and idx > 0 else None
+        next_source = all_segs[idx + 1].source_text if idx is not None and idx < len(all_segs) - 1 else None
+
         existing = (
             db.query(TMEntry)
             .filter(
@@ -82,6 +92,8 @@ def update_segment(
         )
         if existing:
             existing.target_text = body.target_text
+            existing.prev_source = prev_source
+            existing.next_source = next_source
         else:
             db.add(
                 TMEntry(
@@ -89,6 +101,8 @@ def update_segment(
                     target_lang=seg.target_lang,
                     source_text=seg.source_text,
                     target_text=body.target_text,
+                    prev_source=prev_source,
+                    next_source=next_source,
                 )
             )
         db.commit()
