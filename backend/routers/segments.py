@@ -36,7 +36,7 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
         db.add(record)
     db.commit()
 
-    # Auto-apply 101% ICE matches for untranslated segments
+    # Apply 101% ICE matches: fill empty segments and lock all ICE-matched segments
     all_segs = (
         db.query(SegmentRecord)
         .filter(SegmentRecord.file_id == file_id)
@@ -44,8 +44,6 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
         .all()
     )
     for idx, seg in enumerate(all_segs):
-        if seg.status != "new" or seg.target_text.strip():
-            continue
         prev_source = all_segs[idx - 1].source_text if idx > 0 else None
         next_source = all_segs[idx + 1].source_text if idx < len(all_segs) - 1 else None
         ice_match = (
@@ -60,8 +58,9 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
             .first()
         )
         if ice_match:
-            seg.target_text = ice_match.target_text
-            seg.status = "draft"
+            if not seg.target_text.strip():
+                seg.target_text = ice_match.target_text
+                seg.status = "draft"
             seg.tm_score = 101
             seg.locked = True
     db.commit()
