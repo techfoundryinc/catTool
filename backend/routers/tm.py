@@ -26,7 +26,10 @@ def lookup_tm(
 
     results = []
     for entry in candidates:
-        score = fuzz.token_sort_ratio(source_text, entry.source_text)
+        if source_text == entry.source_text:
+            score = 101  # ICE match: identical source string
+        else:
+            score = fuzz.token_sort_ratio(source_text, entry.source_text)
         if score >= MIN_SCORE:
             results.append(
                 TMMatch(
