@@ -34,6 +34,7 @@ class SegmentRecord(Base):
     source_text = Column(Text, nullable=False)
     target_text = Column(Text, nullable=False, default="")
     status = Column(String(20), nullable=False, default="new")
+    tm_score = Column(Integer, nullable=True)
     source_lang = Column(String(10), nullable=False)
     target_lang = Column(String(10), nullable=False)
 
@@ -42,12 +43,17 @@ def init_db():
     Base.metadata.create_all(bind=engine)
     # Migrate: add context columns to existing tm_entries tables
     with engine.connect() as conn:
-        for col in ("prev_source", "next_source"):
+        for col in ("prev_source TEXT", "next_source TEXT", "tm_score INTEGER"):
             try:
-                conn.execute(text(f"ALTER TABLE tm_entries ADD COLUMN {col} TEXT"))
+                conn.execute(text(f"ALTER TABLE tm_entries ADD COLUMN {col}"))
                 conn.commit()
             except Exception:
                 pass
+        try:
+            conn.execute(text("ALTER TABLE segments ADD COLUMN tm_score INTEGER"))
+            conn.commit()
+        except Exception:
+            pass
 
 
 def get_db():

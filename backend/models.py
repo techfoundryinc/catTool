@@ -8,6 +8,7 @@ class SegmentOut(BaseModel):
     source_text: str
     target_text: str
     status: str  # new | draft | confirmed
+    tm_score: Optional[int] = None  # set when TM match was auto-applied
     source_lang: str
     target_lang: str
 
